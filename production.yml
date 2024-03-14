@@ -1,0 +1,11 @@
+services:
+  client:
+    build:
+      target: production
+    ports:
+      - "80:80"
+    expose:
+      - 80
+  server:
+    build:
+      target: production

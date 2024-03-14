@@ -1,0 +1,56 @@
+services:
+  client:
+    container_name: client
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /srv/app
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: ./client/package.json
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+      target: base
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - app
+  server:
+    container_name: server
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+      target: base
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server/src:/srv/app/src
+      - ./server/nodemon.json:/srv/app/nodemon.json
+    expose:
+      - 5000
+    networks:
+      - app
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_container:/data/db
+    expose:
+      - 27017
+    networks:
+      - app
+networks:
+  app:
+      driver: bridge
+volumes:
+  mongodb_data_container:
